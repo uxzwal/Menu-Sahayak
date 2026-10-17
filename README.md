@@ -34,5 +34,5 @@ The open pieces aren't decorative — the entire product is built around an open
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/menu-sahayak.git
+git clone https://github.com/uxzwal/menu-sahayak.git
 cd menu-sahayak
