@@ -1,5 +1,5 @@
 """
-Menu Sahayak — Open-Weight Menu Translator for Indian Restaurants
+Allergen Lens — Menu Allergen Checker for Indian Restaurants
 Powered by Llama 3.3 70B (open-weight) via Groq.
 """
 
@@ -14,23 +14,24 @@ load_dotenv()
 API_KEY = os.getenv("GROQ_API_KEY")
 MODEL = "llama-3.3-70b-versatile"
 
-SYSTEM_PROMPT = """You are a menu translator for Indian restaurants.
+SYSTEM_PROMPT = """You are an allergen analyst for Indian restaurants.
 
 For each dish the user provides:
-1. Keep the dish name TRANSLITERATED in English — do NOT literally translate it.
-   Example: "Paneer Tikka" stays "Paneer Tikka" (never "Cheese Piece").
-2. Add ONE short appetizing English description (max 25 words) mentioning:
-   - key ingredients
-   - spice level (mild / medium / hot)
-3. Output as a clean numbered list, one dish per entry.
-4. Do not add any preamble, notes, or extra text — only the numbered list.
+1. Output as a clean numbered list, one dish per entry.
+2. For each entry, include exactly:
+   - name: dish name
+   - likely allergens: choose only from dairy, nuts, gluten, eggs, soy
+   - safety note: exactly one concise line
+3. Describe allergens as likely/possible based on common preparation. Do not claim certainty.
+4. Include in each safety note that users should verify details with restaurant staff, especially for severe allergies.
+5. Do not add any preamble, notes, or extra text — only the numbered list.
 
 If the input is not a menu, respond: "Please paste a menu (one dish per line)."
 """
 
 
 def translate_menu(menu_text: str):
-    """Stream translated menu from Groq's Llama 3.3 70B."""
+    """Stream allergen analysis from Groq's Llama 3.3 70B."""
     # Guard: empty input
     if not menu_text or not menu_text.strip():
         yield "⚠️ Please paste a menu first (one dish per line)."
@@ -47,7 +48,7 @@ def translate_menu(menu_text: str):
             model=MODEL,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": f"Translate this menu:\n\n{menu_text.strip()}"},
+                {"role": "user", "content": f"Analyze likely allergens for this menu:\n\n{menu_text.strip()}"},
             ],
             temperature=0.4,
             max_tokens=1024,
@@ -81,22 +82,22 @@ demo = gr.Interface(
     fn=translate_menu,
     inputs=gr.Textbox(
         lines=10,
-        label="Paste menu (one dish per line)",
+        label="Paste menu dishes to check allergens (one dish per line)",
         placeholder="Paneer Tikka\nDal Makhani\nChicken Biryani\nMasala Dosa\nGulab Jamun",
     ),
     outputs=gr.Textbox(
         lines=15,
-        label="English menu",
+        label="Allergen analysis",
     ),
-    title="🍛 Menu Sahayak — Open-Weight Menu Translator",
+    title="Allergen Lens — Menu Allergen Checker for Indian Restaurants",
     description=(
         "Powered by **Llama 3.3 70B (open-weight)** via Groq. "
-        "Dish names are transliterated (not literally translated), "
-        "with a 1-line appetizing description for each."
+        "Tourists with allergies may struggle to read Hindi or regional-language menus. "
+        "This tool flags likely allergens per dish using an open-weight Llama model."
     ),
     examples=[
         ["Paneer Tikka\nDal Makhani\nChicken Biryani\nMasala Dosa\nGulab Jamun"],
-        ["Chole Bhature\nPalak Paneer\nRogan Josh\nRasmalai"],
+        ["Chole Bhature\nPalak Paneer\nRogan Josh\nRasmalai\nVeg Manchurian"],
     ],
     theme=gr.themes.Soft(),
     allow_flagging="never",

@@ -1,6 +1,13 @@
-# Menu Sahayak
+# Allergen Lens — Menu Allergen Checker for Indian Restaurants
 
-Menu Sahayak is a local menu translator for Indian restaurants that takes dish names in Hindi or regional languages and converts them into an English-friendly menu with transliterated dish names plus short appetizing descriptions including key ingredients and spice level.
+Allergen Lens is a local allergen-checking app for Indian restaurant menus. Tourists with allergies may struggle to read Hindi or regional-language menus, so this app flags likely allergens per dish using an open-weight Llama model via Groq.
+
+For each dish, the app returns:
+- dish name
+- likely allergens selected from: dairy, nuts, gluten, eggs, soy
+- one concise safety note
+
+Allergen output is intentionally cautious: it marks likely/possible allergens based on common preparation and asks users to verify with restaurant staff for severe allergies.
 
 ## Why open-weight model?
 - **Model swap freedom:** open-weight ecosystems make it easier to switch models without locking into one closed provider.
